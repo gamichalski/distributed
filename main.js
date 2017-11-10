@@ -131,7 +131,7 @@ angular
         $scope.messagesRef = messagesRef;
         $scope.userUid = userData.uid;
         $scope.messages = firebaseService.newFirebaseArray(messagesRef);
-        
+
         var author = localStorage.getItem('author');
         if(!author) {
           modalService.openAuthorSettings($scope);
@@ -149,7 +149,7 @@ angular
       };
 
       $scope.isCensored = function(message, privateWritingOn) {
-        return message.creating && privateWritingOn;
+        return !message.show && privateWritingOn;
       };
 
       $scope.updatePrivateWritingToggle = function(privateWritingOn) {
@@ -178,7 +178,7 @@ angular
         $scope.messages.$save(message);
       };
 
-       $scope.saveAuthor = function(author) {
+      $scope.saveAuthor = function(author) {
         if(author) {
           localStorage.setItem('author', author);
           modalService.closeAll();
