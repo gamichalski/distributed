@@ -131,6 +131,11 @@ angular
         $scope.messagesRef = messagesRef;
         $scope.userUid = userData.uid;
         $scope.messages = firebaseService.newFirebaseArray(messagesRef);
+        
+        var author = localStorage.getItem('author');
+        if(!author) {
+          modalService.openAuthorSettings($scope);
+        }
       }
 
       if ($scope.userId !== '') {
@@ -164,7 +169,20 @@ angular
 
       $scope.saveMessage = function(message) {
         message.creating = false;
+        var author = localStorage.getItem('author');
+
+        if(author) {
+          message.author = author;
+        }
+
         $scope.messages.$save(message);
+      };
+
+       $scope.saveAuthor = function(author) {
+        if(author) {
+          localStorage.setItem('author', author);
+          modalService.closeAll();
+        }
       };
 
       function redirectToBoard() {
@@ -381,7 +399,8 @@ angular
           dragMessageRef.once('value', function(dragMessage) {
             dropMessageRef.update({
               text: dropMessage.val().text + '\n' + dragMessage.val().text,
-              votes: dropMessage.val().votes + dragMessage.val().votes
+              votes: dropMessage.val().votes + dragMessage.val().votes,
+              author: dragMessage.val().author
             });
 
             voteService.mergeMessages($scope.userId, drag.attr('messageId'), drop.attr('messageId'));
@@ -848,6 +867,13 @@ angular
       openCardSettings: function(scope) {
         ngDialog.open({
           template: 'cardSettings',
+          className: 'ngdialog-theme-plain',
+          scope: scope
+        });
+      },
+      openAuthorSettings: function(scope) {
+        ngDialog.open({
+          template: 'authorSettings',
           className: 'ngdialog-theme-plain',
           scope: scope
         });
